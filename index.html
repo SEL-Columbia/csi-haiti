@@ -1,10 +1,10 @@
 <html>
 	<head>
-		<script src='wax/ext/leaflet.js' type='text/javascript'></script>
+		<script src='leaflet/dist/leaflet.js' type='text/javascript'></script>
 		<script src='wax/dist/wax.leaf.js' type='text/javascript'></script>
 		<script src='ucsv-1.0.1-min.js' type='text/javascript'></script>
 		<script src='http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js' type='text/javascript'></script>
-		<link href='wax/ext/leaflet.css' rel='stylesheet' type='text/css' />
+		<link href='leaflet/dist/leaflet.css' rel='stylesheet' type='text/css' />
         <title>CSI Haiti Facilities Viewer</title>
 	</head>
 	<body>
@@ -28,29 +28,72 @@
               data += "</table>";
               return data;
             }             
+            var types = [
+                'church',
+                'settlement',
+                'gov_building'
+            ]
             var url = 'http://a.tiles.mapbox.com/v3/modilabs.map-nuhzv2tu.jsonp';
             wax.tilejson(url, function(tilejson) {
                 var map = new L.Map('map-div')
                 .addLayer(new wax.leaf.connector(tilejson))
                 .setView(new L.LatLng(18.233748078346252, -74.02795493602753), 12);
-                wax.leaf.interaction(map, tilejson);
+                //wax.leaf.interaction(map, tilejson);
+                var churchLayer = new L.LayerGroup();
+                var settlementLayer = new L.LayerGroup();
+                var gov_buildingLayer = new L.LayerGroup();
                 $('#result').load('autres_points_d_infrastructure_janvier_2012_02_13.csv', function() {
                     var array = CSV.csvToArray($('#result').html());
-                    var gps_col = 0;
-                    for (; gps_col < array[0].length; gps_col++) {
-                    if (array[0][gps_col] === 'settlements/SettleGeoCode_1')
-                        break;
+                    var gps_col = {};
+                    var type_col = 0;
+                    var i = 0;
+                    for (; i < array[0].length ; i++) {
+                        switch(array[0][i]) {
+                            case 'settlements/SettleGeoCode_1':
+                                gps_col['settlement'] = i;
+                                break;
+                            case 'gov_building_2/GovGeoCode_2':
+                                gps_col['gov_building'] = i;
+                                break;
+                            case 'churches_5/GovGeoCode_5':
+                                gps_col['church'] = i;
+                                break;
+                            case 'facility_type':
+                                type_col = i;
+                                break;
+                        }
                     }
-                    var i = 1;
+                    i = 1;
                     var geo, lat, lng;
                     for (; i < array.length; i++) {
-                        geo = array[i][gps_col].split(' ');
+                        geo = array[i][gps_col[array[i][type_col]]].split(' ');
                         lat = Number(geo[0]);
                         lng = Number(geo[1]);
                         var marker = new L.Marker(new L.LatLng(lat, lng));
-                        map.addLayer(marker);
+                        switch(array[i][type_col]) {
+                            case 'settlement':
+                                settlementLayer.addLayer(marker);
+                                break;
+                            case 'church':
+                                churchLayer.addLayer(marker);
+                                break;
+                            case 'gov_building':
+                                gov_buildingLayer.addLayer(marker);
+                                break;
+                        }
                         marker.bindPopup(buildData(array[i],array[0]), { 'maxWidth': 500 }); 
                     }
+                    map.addLayer(settlementLayer);
+                    map.addLayer(churchLayer);
+                    map.addLayer(gov_buildingLayer);
+                    var baseMaps = {};
+                    var overlayMaps = {
+                        "Churches": churchLayer,
+                        "Settlements": settlementLayer,
+                        "Government Buildings": gov_buildingLayer
+                    };
+                    var layersControl = new L.Control.Layers(baseMaps, overlayMaps);
+                    map.addControl(layersControl);
                 });
             });
 		</script>
