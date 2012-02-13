@@ -11,16 +11,16 @@
 		<div style='width: 100%; height: 100%;' id='map-div'></div>
         <div id='result' style="display:none"></div>
 		<script>
-            function buildData(array, label){
+            function buildData(array, labels, photoLabel) {
               var data = '<div style="width: 500px">&nbsp;</div>';
               data += '<table>';
               var j;
               for(j = 0; j < array.length; j++) {
-                if (label[j] === 'settlements/SettlePhoto_1') {
+                if (j === photoLabel) {
                     data += '<img width="100%" height="100%" src="https://formhub.s3.amazonaws.com/haiti_facilities_inventory/attachments/' + array[j] + '" />'   
                 } else if (array[j] !== 'n/a' && j < 10) {
                     data += "<tr>";
-                    data += "<td><strong>" + label[j] + "</strong></td>";
+                    data += "<td><strong>" + labels[j] + "</strong></td>";
                     data += "<td>" + array[j] + "</td>";
                     data += "</tr>";
                 }
@@ -58,6 +58,7 @@
                     var array = CSV.csvToArray($('#result').html());
                     var gps_col = {};
                     var type_col = 0;
+                    var photoLabels = {};
                     var i = 0;
                     for (; i < array[0].length ; i++) {
                         switch(array[0][i]) {
@@ -69,6 +70,15 @@
                                 break;
                             case 'churches_5/GovGeoCode_5':
                                 gps_col['church'] = i;
+                                break;
+                            case 'churches_5/GovPhoto_5':
+                                photoLabels['church'] = i
+                                break;
+                            case 'settlements/SettlePhoto_1':
+                                photoLabels['settlement'] = i
+                                break;
+                            case 'gov_building_2/GovPhoto_2':
+                                photoLabels['gov_building'] = i
                                 break;
                             case 'facility_type':
                                 type_col = i;
@@ -82,6 +92,7 @@
                         geo = array[i][gps_col[type]].split(' ');
                         lat = Number(geo[0]);
                         lng = Number(geo[1]);
+                        var photoLabel;
                         var marker = new L.Marker(new L.LatLng(lat, lng), {icon: icons[type]});
                         switch(array[i][type_col]) {
                             case 'settlement':
@@ -94,7 +105,7 @@
                                 gov_buildingLayer.addLayer(marker);
                                 break;
                         }
-                        marker.bindPopup(buildData(array[i],array[0]), { 'maxWidth': 500 }); 
+                        marker.bindPopup(buildData(array[i], array[0], photoLabels[type]), { 'maxWidth': 500 }); 
                     }
                     map.addLayer(settlementLayer);
                     map.addLayer(churchLayer);
