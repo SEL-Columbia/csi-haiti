@@ -27,12 +27,7 @@
               }
               data += "</table>";
               return data;
-            }             
-            var types = [
-                'church',
-                'settlement',
-                'gov_building'
-            ]
+            }
             var url = 'http://a.tiles.mapbox.com/v3/modilabs.map-nuhzv2tu.jsonp';
             wax.tilejson(url, function(tilejson) {
                 var map = new L.Map('map-div')
@@ -42,6 +37,23 @@
                 var churchLayer = new L.LayerGroup();
                 var settlementLayer = new L.LayerGroup();
                 var gov_buildingLayer = new L.LayerGroup();
+                var settlementIcon = L.Icon.extend({
+                    iconUrl: 'icons/normal_education.png',
+                    iconSize: new L.Point(33, 20)
+                });
+                var gov_buildingIcon = L.Icon.extend({
+                    iconUrl: 'icons/companies.png',
+                    iconSize: new L.Point(32, 32)
+                });
+                var churchIcon = L.Icon.extend({
+                    iconUrl: 'icons/church.png',
+                    iconSize: new L.Point(32, 32)
+                });
+                var icons = {
+                    'settlement': new settlementIcon(),
+                    'gov_building': new gov_buildingIcon(),
+                    'church': new churchIcon()
+                };
                 $('#result').load('autres_points_d_infrastructure_janvier_2012_02_13.csv', function() {
                     var array = CSV.csvToArray($('#result').html());
                     var gps_col = {};
@@ -66,10 +78,11 @@
                     i = 1;
                     var geo, lat, lng;
                     for (; i < array.length; i++) {
-                        geo = array[i][gps_col[array[i][type_col]]].split(' ');
+                        var type = array[i][type_col];
+                        geo = array[i][gps_col[type]].split(' ');
                         lat = Number(geo[0]);
                         lng = Number(geo[1]);
-                        var marker = new L.Marker(new L.LatLng(lat, lng));
+                        var marker = new L.Marker(new L.LatLng(lat, lng), {icon: icons[type]});
                         switch(array[i][type_col]) {
                             case 'settlement':
                                 settlementLayer.addLayer(marker);
