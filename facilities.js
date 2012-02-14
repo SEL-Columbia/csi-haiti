@@ -3,9 +3,10 @@ function buildData(array, labels, photoCols) {
   data += '<table>';
   var j;
   for(j = 0; j < array.length; j++) {
-    if (photoCols.indexOf(j) != -1) {
-        data += '<img width="100%" height="100%" src="https://formhub.s3.amazonaws.com/haiti_facilities_inventory/attachments/' + array[j] + '" />'   
-    } else if (array[j] !== 'n/a') {
+    if (array[j] !== 'n/a') {
+        if (photoCols.indexOf(j) != -1) {
+            data += '<img width="100%" height="100%" src="https://formhub.s3.amazonaws.com/haiti_facilities_inventory/attachments/' + array[j] + '" />'   
+        }
         data += "<tr>";
         data += "<td><strong>" + labels[j] + "</strong></td>";
         data += "<td>" + array[j] + "</td>";
