@@ -1,5 +1,4 @@
-function buildData(array, labels, photoCols, geoCols, startCol) {
-    var hiddenCols = ['_xform_id_string'];
+function buildData(array, labels, photoCols, geoCols, hiddenCols, startCol) {
     var data = '<table class="dataPopup">';
     var photos = "";
     var j;
@@ -19,21 +18,23 @@ function buildData(array, labels, photoCols, geoCols, startCol) {
     return '<div style="width: 600px">&nbsp;</div>' + photos + data;
 }
 
-function buildDataTb(array, dataId, startCol) {
-    var i = 0;
-    var j = 0;
+function buildDataTb(array, labels, dataId, photoCols, geoCols, hiddenCols, startCol) {
+    var i;
+    var j;
     var tb = '<table id = "buildData"><thead><tr>';
-    for (j = startCol; j < array[0].length; j++) {
-        tb += "<th>" + array[0][j] + "</th>";
+    for (j = startCol; j < labels.length; j++) {
+        if (geoCols.indexOf(j) == -1 && photoCols.indexOf(j) == -1 && hiddenCols.indexOf(labels[j]) == -1)
+            tb += "<th>" + labels[j] + "</th>";
     }
-    tb+="</tr></thead><tbody>";
+    tb += "</tr></thead><tbody>";
    
     for (i = 1; i < array.length; i++) {
-     tb += "<tr>";
-      for (j = startCol; j < array[0].length; j++) {
-        tb += "<td>" + array[i][j] + "</td>";
-    }
-    tb += "</tr>";
+        tb += "<tr>";
+            for (j = startCol; j < labels.length; j++) {
+                if (geoCols.indexOf(j) == -1 && photoCols.indexOf(j) == -1 && hiddenCols.indexOf(labels[j]) == -1)
+                    tb += "<td>" + array[i][j] + "</td>";
+            }
+        tb += "</tr>";
     }
     tb += "</tbody></table>";
     $(dataId).html(tb);
@@ -68,19 +69,20 @@ function loadMapData(csv, layerColunmName, gpsColumns, photoColumns, startCol) {
         
         $(dataID).load(csv, function() {
             var array = CSV.csvToArray($(dataID).html());
-            buildDataTb(array, dataID, startCol);
+            var hiddenCols = ['_xform_id_string'];
             var gps_cols = [];
             var type_col = 0;
             var photo_cols = [];
             var i = 0;
             var layers = {};
             var layer_col = 0;
-            for (; i < array[0].length ; i++) {
-                if (gpsColumns.indexOf(array[0][i]) != -1) {
+            var labels = array[0];
+            for (; i < labels.length ; i++) {
+                if (gpsColumns.indexOf(labels[i]) != -1) {
                    gps_cols.push(i);
-                } else if (photoColumns.indexOf(array[0][i]) != -1) {
+                } else if (photoColumns.indexOf(labels[i]) != -1) {
                    photo_cols.push(i);
-                } else if (array[0][i] === layerColunmName) {
+                } else if (labels[i] === layerColunmName) {
                     layer_col = i;
                     var j = 1;
                     for (; j < array.length; j++) {
@@ -88,6 +90,8 @@ function loadMapData(csv, layerColunmName, gpsColumns, photoColumns, startCol) {
                     }
                 }
             }
+            // build data after getting column info
+            buildDataTb(array, labels, dataID, gps_cols, photo_cols, hiddenCols, startCol);
             for (type in layers) {
              layers[type] = new L.LayerGroup();
             }
@@ -105,7 +109,7 @@ function loadMapData(csv, layerColunmName, gpsColumns, photoColumns, startCol) {
                 }
                 var marker = new L.Marker(new L.LatLng(lat, lng), {icon: icons[type]});
                 layers[type].addLayer(marker);
-                marker.bindPopup(buildData(array[i], array[0], photo_cols,gps_cols , startCol), { 'maxWidth': 400 }); 
+                marker.bindPopup(buildData(array[i], labels, photo_cols, gps_cols, hiddenCols, startCol), { 'maxWidth': 400 }); 
             }
              
             var overlayMaps = {};
