@@ -16,9 +16,31 @@ function buildData(array, labels, photoCols) {
   return data;
 }
 
+function buildDataTb(array, dataId){
+    var i = 0;
+    var j = 0;
+    var tb = '<table id = "buildData"><thead><tr>';
+    for(j = 0; j < array[0].length; j++) {
+        tb+="<th>"+array[0][j]+"</th>";
+    }
+    tb+="</tr></thead><tbody>";
+   
+    for(i = 1; i < array.length; i++) {
+     tb+="<tr>";
+      for(j = 0; j < array[0].length; j++){
+        tb+="<td>"+array[i][j]+"</td>";
+    }
+    tb+="</tr>";
+    }
+    tb+="</tbody></table>";
+    $(dataId).html(tb);
+    $('#buildData').dataTable();
+}
+
 function loadMapData(csv, layerColunmName, gpsColumns, photoColumns) {
 
     var url = 'http://a.tiles.mapbox.com/v3/modilabs.map-nuhzv2tu.jsonp';
+    var dataID = "#result";
     wax.tilejson(url, function(tilejson) {
         var map = new L.Map('map-div')
             .addLayer(new wax.leaf.connector(tilejson))
@@ -41,8 +63,9 @@ function loadMapData(csv, layerColunmName, gpsColumns, photoColumns) {
             'church': new churchIcon()
         };
         
-        $('#result').load(csv, function() {
-            var array = CSV.csvToArray($('#result').html());
+        $(dataID).load(csv, function() {
+            var array = CSV.csvToArray($(dataID).html());
+            buildDataTb(array, dataID);
             var gps_cols = [];
             var type_col = 0;
             var photo_cols = [];
@@ -95,3 +118,20 @@ function loadMapData(csv, layerColunmName, gpsColumns, photoColumns) {
         });
     });
 }
+
+$(document).ready(function() {
+    $('#showData').click(function(){
+        $('#map-div').hide();
+        $('#result').show();
+        return false;
+    });
+
+    $('#showMap').click(function(){
+        $('#map-div').show();
+        $('#result').hide();
+        return false; 
+    });
+    
+    loadMapData('autres_points_d_infrastructure_janvier_2012_02_13.csv', 'facility_type', ['settlements/SettleGeoCode_1', 'gov_building_2/GovGeoCode_2', 'churches_5/GovGeoCode_5'], ['churches_5/GovPhoto_5', 'settlements/SettlePhoto_1', 'gov_building_2/GovPhoto_2'])
+});
+
