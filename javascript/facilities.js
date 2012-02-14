@@ -1,34 +1,36 @@
-function buildData(array, labels, photoCols) {
-  var data = '<div style="width: 600px">&nbsp;</div>';
-  data += '<table>';
+function buildData(array, labels, photoCols,geoCol,StartCol) {
+  var data = '<table class="dataPopup">';
+  var photos = "";
   var j;
-  for(j = 0; j < array.length; j++) {
+  for(j = StartCol; j < array.length; j++) {
     if (array[j] !== 'n/a') {
         if (photoCols.indexOf(j) != -1) {
-            data += '<img width="100%" height="100%" src="https://formhub.s3.amazonaws.com/haiti_facilities_inventory/attachments/' + array[j] + '" />'   
+            photos += '<img width="100%" height="100%" src="https://formhub.s3.amazonaws.com/haiti_facilities_inventory/attachments/' + array[j] + '" />'   
         }
-        data += "<tr>";
-        data += "<td><strong>" + labels[j] + "</strong></td>";
-        data += "<td>" + array[j] + "</td>";
-        data += "</tr>";
+        else if (geoCol.indexOf(j) == -1) {
+            data += "<tr>";
+            data += "<td><strong>" + labels[j] + "</strong></td>";
+            data += "<td>" + array[j] + "</td>";
+            data += "</tr>";
+        }
     }
   }
   data += "</table>";
-  return data;
+  return '<div style="width: 600px">&nbsp;</div>' + photos + data;
 }
 
-function buildDataTb(array, dataId){
+function buildDataTb(array, dataId, StartCol){
     var i = 0;
     var j = 0;
     var tb = '<table id = "buildData"><thead><tr>';
-    for(j = 0; j < array[0].length; j++) {
+    for(j = StartCol; j < array[0].length; j++) {
         tb+="<th>"+array[0][j]+"</th>";
     }
     tb+="</tr></thead><tbody>";
    
     for(i = 1; i < array.length; i++) {
      tb+="<tr>";
-      for(j = 0; j < array[0].length; j++){
+      for(j = StartCol; j < array[0].length; j++){
         tb+="<td>"+array[i][j]+"</td>";
     }
     tb+="</tr>";
@@ -38,7 +40,7 @@ function buildDataTb(array, dataId){
     $('#buildData').dataTable();
 }
 
-function loadMapData(csv, layerColunmName, gpsColumns, photoColumns) {
+function loadMapData(csv, layerColunmName, gpsColumns, photoColumns,startCol) {
 
     var url = 'http://a.tiles.mapbox.com/v3/modilabs.map-nuhzv2tu.jsonp';
     var dataID = "#result";
@@ -66,7 +68,7 @@ function loadMapData(csv, layerColunmName, gpsColumns, photoColumns) {
         
         $(dataID).load(csv, function() {
             var array = CSV.csvToArray($(dataID).html());
-            buildDataTb(array, dataID);
+            buildDataTb(array, dataID, startCol);
             var gps_cols = [];
             var type_col = 0;
             var photo_cols = [];
@@ -103,16 +105,15 @@ function loadMapData(csv, layerColunmName, gpsColumns, photoColumns) {
                 }
                 var marker = new L.Marker(new L.LatLng(lat, lng), {icon: icons[type]});
                 layers[type].addLayer(marker);
-                marker.bindPopup(buildData(array[i], array[0], photo_cols), { 'maxWidth': 600 }); 
+                marker.bindPopup(buildData(array[i], array[0], photo_cols,gps_cols , startCol), { 'maxWidth': 400 }); 
             }
+             
             var overlayMaps = {};
             for (type in layers) {
               map.addLayer(layers[type]);
               overlayMaps[type] = layers[type];  
             }
             
-            // map.addLayer(churchLayer);
-            //map.addLayer(gov_buildingLayer);
             var baseMaps = {};
             var layersControl = new L.Control.Layers(baseMaps, overlayMaps);
             map.addControl(layersControl);
@@ -133,6 +134,6 @@ $(document).ready(function() {
         return false; 
     });
     
-    loadMapData('autres_points_d_infrastructure_janvier_2012_02_13.csv', 'facility_type', ['settlements/SettleGeoCode_1', 'gov_building_2/GovGeoCode_2', 'churches_5/GovGeoCode_5'], ['churches_5/GovPhoto_5', 'settlements/SettlePhoto_1', 'gov_building_2/GovPhoto_2'])
+    loadMapData('autres_points_d_infrastructure_janvier_2012_02_13.csv', 'facility_type', ['settlements/SettleGeoCode_1', 'gov_building_2/GovGeoCode_2', 'churches_5/GovGeoCode_5'], ['churches_5/GovPhoto_5', 'settlements/SettlePhoto_1', 'gov_building_2/GovPhoto_2'],6)
 });
 
