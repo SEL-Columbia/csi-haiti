@@ -1,46 +1,46 @@
-function buildData(array, labels, photoCols,geoCol,StartCol) {
-  var data = '<table class="dataPopup">';
-  var photos = "";
-  var j;
-  for(j = StartCol; j < array.length; j++) {
-    if (array[j] !== 'n/a') {
-        if (photoCols.indexOf(j) != -1) {
-            photos += '<img width="100%" height="100%" src="https://formhub.s3.amazonaws.com/haiti_facilities_inventory/attachments/' + array[j] + '" />'   
-        }
-        else if (geoCol.indexOf(j) == -1) {
-            data += "<tr>";
-            data += "<td><strong>" + labels[j] + "</strong></td>";
-            data += "<td>" + array[j] + "</td>";
-            data += "</tr>";
+function buildData(array, labels, photoCols, geoCols, startCol) {
+    var hiddenCols = ['_xform_id_string'];
+    var data = '<table class="dataPopup">';
+    var photos = "";
+    var j;
+    for (j = startCol; j < array.length; j++) {
+        if (array[j] !== 'n/a') {
+            if (photoCols.indexOf(j) != -1) {
+                photos += '<img width="100%" height="100%" src="https://formhub.s3.amazonaws.com/haiti_facilities_inventory/attachments/' + array[j] + '" />'   
+            } else if (geoCols.indexOf(j) == -1 && hiddenCols.indexOf(labels[j]) == -1) {
+                data += "<tr>";
+                data += "<td><strong>" + labels[j] + "</strong></td>";
+                data += "<td>" + array[j] + "</td>";
+                data += "</tr>";
+            }
         }
     }
-  }
-  data += "</table>";
-  return '<div style="width: 600px">&nbsp;</div>' + photos + data;
+    data += "</table>";
+    return '<div style="width: 600px">&nbsp;</div>' + photos + data;
 }
 
-function buildDataTb(array, dataId, StartCol){
+function buildDataTb(array, dataId, startCol) {
     var i = 0;
     var j = 0;
     var tb = '<table id = "buildData"><thead><tr>';
-    for(j = StartCol; j < array[0].length; j++) {
-        tb+="<th>"+array[0][j]+"</th>";
+    for (j = startCol; j < array[0].length; j++) {
+        tb += "<th>" + array[0][j] + "</th>";
     }
     tb+="</tr></thead><tbody>";
    
-    for(i = 1; i < array.length; i++) {
-     tb+="<tr>";
-      for(j = StartCol; j < array[0].length; j++){
-        tb+="<td>"+array[i][j]+"</td>";
+    for (i = 1; i < array.length; i++) {
+     tb += "<tr>";
+      for (j = startCol; j < array[0].length; j++) {
+        tb += "<td>" + array[i][j] + "</td>";
     }
-    tb+="</tr>";
+    tb += "</tr>";
     }
-    tb+="</tbody></table>";
+    tb += "</tbody></table>";
     $(dataId).html(tb);
     $('#buildData').dataTable();
 }
 
-function loadMapData(csv, layerColunmName, gpsColumns, photoColumns,startCol) {
+function loadMapData(csv, layerColunmName, gpsColumns, photoColumns, startCol) {
 
     var url = 'http://a.tiles.mapbox.com/v3/modilabs.map-nuhzv2tu.jsonp';
     var dataID = "#result";
@@ -122,18 +122,17 @@ function loadMapData(csv, layerColunmName, gpsColumns, photoColumns,startCol) {
 }
 
 $(document).ready(function() {
-    $('#showData').click(function(){
+    $('#showData').click(function() {
         $('#map-div').hide();
         $('#result').show();
         return false;
     });
 
-    $('#showMap').click(function(){
+    $('#showMap').click(function() {
         $('#map-div').show();
         $('#result').hide();
-        return false; 
+        return false;
     });
     
-    loadMapData('autres_points_d_infrastructure_janvier_2012_02_13.csv', 'facility_type', ['settlements/SettleGeoCode_1', 'gov_building_2/GovGeoCode_2', 'churches_5/GovGeoCode_5'], ['churches_5/GovPhoto_5', 'settlements/SettlePhoto_1', 'gov_building_2/GovPhoto_2'],6)
+    loadMapData('autres_points_d_infrastructure_janvier_2012_02_13.csv', 'facility_type', ['settlements/SettleGeoCode_1', 'gov_building_2/GovGeoCode_2', 'churches_5/GovGeoCode_5'], ['churches_5/GovPhoto_5', 'settlements/SettlePhoto_1', 'gov_building_2/GovPhoto_2'], 6)
 });
-
