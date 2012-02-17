@@ -78,7 +78,9 @@ function loadMapData(csv, layerColunmName, gpsColumns, photoColumns, startCol) {
             var layer_col = 0;
             var labels = array[0];
             for (; i < labels.length ; i++) {
-                if (gpsColumns.indexOf(labels[i]) != -1) {
+               // if (gpsColumns.indexOf(labels[i]) != -1) {
+               //using jquery rather than the javascipt above
+                 if ($.inArray(gpsColumns,labels[i])!= -1){
                    gps_cols.push(i);
                 } else if (photoColumns.indexOf(labels[i]) != -1) {
                    photo_cols.push(i);
@@ -138,5 +140,5 @@ $(document).ready(function() {
         return false;
     });
     
-    loadMapData('autres_points_d_infrastructure_janvier_2012_02_13.csv', 'facility_type', ['settlements/SettleGeoCode_1', 'gov_building_2/GovGeoCode_2', 'churches_5/GovGeoCode_5'], ['churches_5/GovPhoto_5', 'settlements/SettlePhoto_1', 'gov_building_2/GovPhoto_2'], 6)
+    
 });

@@ -1,0 +1,90 @@
+﻿<html>
+<head>
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<script src='leaflet/dist/leaflet.js' type='text/javascript'></script>
+		<script src='wax/dist/wax.leaf.js' type='text/javascript'></script>
+		<script src='javascript/ucsv-1.0.1-min.js' type='text/javascript'></script>
+		<script src='javascript/jquery-1.7.1.min.js' type='text/javascript'></script>
+		<link href='leaflet/dist/leaflet.css' rel='stylesheet' type='text/css'>
+		<script src='javascript/jquery.dataTables.js' type='text/javascript'></script>   
+		<script src='javascript/facilities.js' type='text/javascript'></script>
+		<script src='javascript/ict4ag.js' type='text/javascript'></script>
+        <style type="text/css" title="currentStyle">
+			@import "styles/demo_page.css";
+			@import "styles/demo_table.css";
+			@import "styles/screen.css";
+			@import url('styles/menu.css');
+		</style>
+		<link href='leaflet/dist/leaflet.css' rel='stylesheet' type='text/css'>
+        <title>CSI Haiti Facilities Viewer</title>
+        </head>
+
+<body style=" width: 100%; height: 100%;" >
+<script type="text/javascript">
+	/*vvar y = 0;
+	function showData(){
+	 $('#facilities').click(function(){
+	  $('facilitiesdetails').show();
+     $('ict4agdetails').hide();
+     });
+     
+     $('#ict4ag').click(function(){
+	  $('facilitiesdetails').hide();
+     $('ict4agdetails').show();
+     });
+
+	}
+    function showDetails(x){
+    y = x;
+    if (y ==1){
+    document.getElementById('facilitiesdetails').style.display = 'block';
+    document.getElementById('ict4agdetails').style.display = 'none';
+    return false;
+    }
+     else if (y == 2)
+     {
+    document.getElementById('facilitiesdetails').style.display = 'none';
+    document.getElementById('ict4agdetails').style.display = 'block';
+    return false;
+     }
+    }*/
+    </script> 
+<body background="CSI-logo-Corporate_2.png">
+<table style="width: 100%; height: 100%;" cellspacing="0" cellpadding="0">
+	<tr>
+		<td style="height: 60px" bgcolor="GhostWhite">
+		<div id="menu" style="width:auto; height:60px; display:block"> 
+		<ul>
+		<li style="left: 0px; top: 0px; width: 90px">
+		<a href="" id="ICT4AG" onclick="loadMapData('autres_points_d_infrastructure_janvier_2012_02_13.csv', 'facility_type', ['settlements/SettleGeoCode_1', 'gov_building_2/GovGeoCode_2', 'churches_5/GovGeoCode_5'], ['churches_5/GovPhoto_5', 'settlements/SettlePhoto_1', 'gov_building_2/GovPhoto_2'], 6)
+">ICT4AG </a>
+		 <ul>
+	      <li><a href="" id="showDataIct">Show Data</a></li>
+	      <li><a href="" id="showMapIct">Show Map</a></li>
+	   </ul> 
+	   </li>
+		<li style="left: 0px; top: 0px; width: 90px">
+		<a href="" id="Facilities" onclick="loadMapData('autres_points_d_infrastructure_janvier_2012_02_13.csv', 'facility_type', ['settlements/SettleGeoCode_1', 'gov_building_2/GovGeoCode_2', 'churches_5/GovGeoCode_5'], ['churches_5/GovPhoto_5', 'settlements/SettlePhoto_1', 'gov_building_2/GovPhoto_2'], 6)
+">Facilities </a>
+		<ul>
+	       <li><a href="" id="showData">Show Data</a></li>
+	       <li><a href="" id="showMap">Show Map</a></li>
+	    </ul>
+	    </li>
+	</ul>
+ </div>
+		</td>
+		<td style="height: 27px"></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+		<div style='width: 100%; height: 100%; display:block' id='map-div'></div>
+		<div style='width: 100%; height: 100%; display:none' id='map-div2'></div>
+        <div id='result' style="display:none"></div>
+        <div id='result2' style="display:none"></div>
+		</td>
+	</tr>
+</table>
+</body>
+
+</html>
